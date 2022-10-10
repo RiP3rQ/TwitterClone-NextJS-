@@ -8,14 +8,63 @@ import {
   } from "@heroicons/react/outline";
   import data from '@emoji-mart/data';
   import Picker from '@emoji-mart/react';
+  import { db, storage } from "../firebase";
+  import {
+    addDoc,
+    collection,
+    doc,
+    serverTimestamp,
+    updateDoc,
+  } from "@firebase/firestore";
+  import { getDownloadURL, ref, uploadString } from "@firebase/storage";
 
 export default function Input() {
     const [ input, setInput ] = useState('');
     const [ selectedFile, setSelectedFile ] = useState(null);
     const [ showEmojis, setShowEmojis ] = useState(false);
     const filePickerRef = useRef(null);
+    const [loading, setLoading] = useState(false);
 
-    const addImageToPost = () => {};
+    const sendPost = async () => {
+      if (loading) return;
+      setLoading(true);
+  
+      const docRef = await addDoc(collection(db, "posts"), {
+        // id: session.user.uid,
+        // username: session.user.name,
+        // userImg: session.user.image,
+        // tag: session.user.tag,
+        text: input,
+        timestamp: serverTimestamp(),
+      });
+
+      const imageRef = ref(storage, `posts/${docRef.id}/image`);
+
+      if (selectedFile) {
+        await uploadString(imageRef, selectedFile, "data_url").then(async () => {
+          const downloadURL = await getDownloadURL(imageRef);
+          await updateDoc(doc(db, "posts", docRef.id), {
+            image: downloadURL,
+          });
+        });
+      }
+  
+      setLoading(false);
+      setInput("");
+      setSelectedFile(null);
+      setShowEmojis(false);
+    };
+
+    const addImageToPost = (e) => {
+      const reader = new FileReader();
+      if (e.target.files[0]) {
+        reader.readAsDataURL(e.target.files[0]);
+      }
+  
+      reader.onload = (readerEvent) => {
+        setSelectedFile(readerEvent.target.result);
+      };
+    };
 
     const addEmoji = (e) => {
         let sym = e.unified.split("-");
