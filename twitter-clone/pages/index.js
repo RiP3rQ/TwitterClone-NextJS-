@@ -1,8 +1,14 @@
 import Head from 'next/head'
 import Feed from '../components/Feed'
 import Sidebar from '../components/Sidebar'
+import { getProviders, getSession, useSession } from "next-auth/react";
+import Login from '../components/Login';
 
-export default function Home() {
+export default function Home({ trendingResults, followResults, providers }) {
+  const { data: session } = useSession();
+
+  if (!session) return <Login providers={providers} />;
+
   return (
     <div>
       <Head>
@@ -18,13 +24,26 @@ export default function Home() {
 
         {/* Modal */}
       </main>
-
-
-
-
-
-
-    </div>
-    
+    </div>  
   )
+}
+
+export async function getServerSideProps(context) {
+  const trendingResults = await fetch("https://api.npoint.io/9cb87f06da01706ea2ac").then(
+    (res) => res.json()
+  );
+  const followResults = await fetch("https://api.npoint.io/d0d22c8016dcf0b5d66a").then(
+    (res) => res.json()
+  );
+  const providers = await getProviders();
+  const session = await getSession(context);
+
+  return {
+    props: {
+      trendingResults,
+      followResults,
+      providers,
+      session,
+    },
+  };
 }
