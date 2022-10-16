@@ -92,7 +92,10 @@ export default function PostPage() {
 
         </div>
 
-        {/* Widgets */}
+        <Widgets
+          trendingResults={trendingResults}
+          followResults={followResults}
+        />
 
         {isOpen && <Modal />}
       </main>
