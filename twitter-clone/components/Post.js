@@ -46,6 +46,14 @@ export default function Post({ id, post, postPage }) {
     [db, id]
   );
 
+  useEffect(
+    () =>
+      onSnapshot(collection(db, "posts", id, "comments"), (snapshot) =>
+        setComments(snapshot.docs)
+      ),
+    [db, id]
+  );
+
   useEffect( 
     () => 
     setLiked(
