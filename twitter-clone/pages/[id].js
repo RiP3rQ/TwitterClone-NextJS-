@@ -12,7 +12,7 @@ import {
   import { modalState } from "../atoms/modalAtom";
   import Modal from "../components/Modal";
   import Sidebar from "../components/Sidebar";
-//   import Widgets from "../components/Widgets";
+  import Widgets from "../components/Widgets";
   import Post from "../components/Post";
   import { db } from "../firebase";
   import { ArrowLeftIcon } from "@heroicons/react/solid";
@@ -20,7 +20,7 @@ import {
   import Head from "next/head";
   import Login from "../components/Login";
 
-export default function PostPage() {
+export default function PostPage({ trendingResults, followResults, providers }) {
     const { data: session } = useSession();
     const [isOpen, setIsOpen] = useRecoilState(modalState);
     const [post, setPost] = useState();
